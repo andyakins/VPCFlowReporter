@@ -1,0 +1,5 @@
+#! /bin/sh
+
+# Simple wrapper around the ruby script, to make it easier.
+
+./app/vpcfr.rb $@
