@@ -11,4 +11,4 @@ path = Pathname.new(__FILE__)
 $:.unshift File.expand_path "../../bundle", path.realpath
 
 require "bundler/setup"
-load File.expand_path "../../bundle/ruby/2.2.0/gems/aws-sdk-core-2.9.42/bin/aws.rb", path.realpath
+load File.expand_path "../../bundle/ruby/2.4.0/gems/aws-sdk-core-2.9.42/bin/aws.rb", path.realpath
