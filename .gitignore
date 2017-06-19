@@ -4,6 +4,7 @@
 
 /.bundle
 /bundle
+/local
 *.test
 *.gem
 *.rbc
