@@ -10,7 +10,7 @@ module VPCFR
   it 'can parse the destination to bucket and key elements' do
     writer = VPCFRS3Writer.new(VPCFRTestData.awsAccessKeyID,
       VPCFRTestData.awsSecretAccessKey, VPCFRTestData.awsRegion)
-    writer.destination = VPCFRTestData.awsS3URL
+    writer.destination = VPCFRTestData.awsS3URI
     expect(writer.bucket).to eq(VPCFRTestData.awsS3Bucket)
     expect(writer.key).to eq(VPCFRTestData.awsS3Key)
   end

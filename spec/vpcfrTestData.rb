@@ -3,10 +3,10 @@ class VPCFRTestData
   # NOTE!
   # In order for the integration and acceptance tests to work,
   # the following values must point to a valid AWS account/region/bucket
-  @@awsAccessKeyID = 'AKIAJWQAFZ7TTPBQVDVQ'
-  @@awsSecretAccessKey = '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'
-  @@awsRegion = 'us-east-2'
-  @@awsS3URL = 's3://vpcfr/vpcfr.dat'
+  @@awsAccessKeyID = ''
+  @@awsSecretAccessKey = ''
+  @@awsRegion = ''
+  @@awsS3URI = 's3://vpcfr/vpcfr.dat'
   @@awsS3Bucket = 'vpcfr' # value that should be parsed for bucket from URL
   @@awsS3Key = 'vpcfr.dat' # value that should be parsed for key from URL
 
@@ -180,8 +180,8 @@ class VPCFRTestData
     @@awsRegion
   end
 
-  def self.awsS3URL
-    @@awsS3URL
+  def self.awsS3URI
+    @@awsS3URI
   end
 
   def self.awsS3Bucket

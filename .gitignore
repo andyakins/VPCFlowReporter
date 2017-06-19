@@ -8,6 +8,8 @@
 *.gem
 *.rbc
 .rvmrc
+.yardoc
+/doc
 
 #
 # OS X ignores

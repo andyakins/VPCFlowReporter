@@ -10,7 +10,7 @@ module VPCFR
   it 'will be able to write data to S3' do
     writer = VPCFRS3Writer.new(VPCFRTestData.awsAccessKeyID,
       VPCFRTestData.awsSecretAccessKey, VPCFRTestData.awsRegion)
-    writer.destination = VPCFRTestData.awsS3URL
+    writer.destination = VPCFRTestData.awsS3URI
 
     s3 = Aws::S3::Resource.new(region: VPCFRTestData.awsRegion,
       credentials: Aws::Credentials.new(VPCFRTestData.awsAccessKeyID,
