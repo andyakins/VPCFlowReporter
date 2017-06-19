@@ -144,7 +144,8 @@ module VPCFR
       if @isGood == true
 
         if @writer == nil
-          @writer = VPCFRS3Writer.new
+          @writer = VPCFRS3Writer.new(@awsAccessKeyID,
+            @awsSecretAccessKey, @awsRegion)
         end
 
         if @formatter == nil

@@ -1,5 +1,6 @@
 #! /usr/bin/env ruby
-require_relative('vpcfrRunner')
+
+require_relative 'vpcfrRunner'
 
 module VPCFR
   runner = VPCFRRunner.new

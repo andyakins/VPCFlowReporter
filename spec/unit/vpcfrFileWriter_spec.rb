@@ -4,7 +4,7 @@ require_relative '../../app/vpcfrFileWriter'
 
 module VPCFR
 
-  destination = 'data/writerTest.dat'
+  destination = 'data/fileWriter.test'
   testdata ="{\n  \"172.16.8.1\": 4,\n  \"172.16.8.2\": 3\n}"
 
   RSpec.describe 'A correct file writer' do
