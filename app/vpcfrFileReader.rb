@@ -6,7 +6,7 @@ module VPCFR
     def initialize(columnNames)
       @columnNames = columnNames
     end
-    
+
     def read
       data = []
       File.open(@source) do |file|

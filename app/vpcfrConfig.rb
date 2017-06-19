@@ -7,7 +7,6 @@ require_relative 'vpcfrS3Writer'
 require_relative 'vpcfrParser'
 
 module VPCFR
-
   class VPCFRConfig
     attr_reader :aggregateCol, :awsAccessKeyID, :awsSecretAccessKey, :awsRegion,
       :checkCol, :destination, :writer, :formatter, :parser, :pattern, :source,
