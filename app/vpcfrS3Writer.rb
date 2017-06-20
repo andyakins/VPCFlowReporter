@@ -1,3 +1,5 @@
+require 'rubygems'
+require 'bundler/setup'
 require 'aws-sdk'
 require 'uri'
 require_relative 'vpcfrWriter'
