@@ -25,6 +25,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.6.0)
     rspec-support (3.6.0)
+    yard (0.9.9)
 
 PLATFORMS
   ruby
@@ -33,6 +34,7 @@ DEPENDENCIES
   aws-sdk (= 2.9.42)
   coderay (= 1.1.1)
   rspec (= 3.6.0)
+  yard (= 0.9.9)
 
 BUNDLED WITH
    1.15.1

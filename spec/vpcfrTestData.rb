@@ -33,7 +33,7 @@ class VPCFRTestData
       "dstaddr"=>"203.0.113.12", "srcport"=>"0", "dstport"=>"0",
       "protocol"=>"1", "packets"=>"4", "bytes"=>"336",
       "start"=>"1432917094", "end"=>"1432917142",
-      "action"=>"ACCEPT", "logstatus"=>"OK"
+      "action"=>"REJECT", "logstatus"=>"OK"
     },
     {
       "version"=>"2", "accountid"=>"123456789010",
@@ -41,7 +41,7 @@ class VPCFRTestData
       "dstaddr"=>"172.31.9.22", "srcport"=>"49761",
       "dstport"=>"3389", "protocol"=>"6", "packets"=>"20",
       "bytes"=>"4249", "start"=>"1418530010", "end"=>"1418530070",
-      "action"=>"REJECT", "logstatus"=>"OK"
+      "action"=>"ACCEPT", "logstatus"=>"OK"
     }
   ]
 
@@ -49,14 +49,14 @@ class VPCFRTestData
 
   @@formatterCSVArrayResult = <<~HEREDOC
     2,123456789010,eni-abc123de,172.31.9.69,172.31.9.12,49761,3389,6,20,4249,1418530010,1418530070,REJECT,OK
-    2,123456789010,eni-1235b8ca,172.31.16.139,203.0.113.12,0,0,1,4,336,1432917094,1432917142,ACCEPT,OK
-    2,123456789010,eni-abc123de,172.31.9.49,172.31.9.22,49761,3389,6,20,4249,1418530010,1418530070,REJECT,OK
+    2,123456789010,eni-1235b8ca,172.31.16.139,203.0.113.12,0,0,1,4,336,1432917094,1432917142,REJECT,OK
+    2,123456789010,eni-abc123de,172.31.9.49,172.31.9.22,49761,3389,6,20,4249,1418530010,1418530070,ACCEPT,OK
   HEREDOC
 
   @@formatterCSVCustomArrayResult = <<~HEREDOC
     2;123456789010;eni-abc123de;172.31.9.69;172.31.9.12;49761;3389;6;20;4249;1418530010;1418530070;REJECT;OK
-    2;123456789010;eni-1235b8ca;172.31.16.139;203.0.113.12;0;0;1;4;336;1432917094;1432917142;ACCEPT;OK
-    2;123456789010;eni-abc123de;172.31.9.49;172.31.9.22;49761;3389;6;20;4249;1418530010;1418530070;REJECT;OK
+    2;123456789010;eni-1235b8ca;172.31.16.139;203.0.113.12;0;0;1;4;336;1432917094;1432917142;REJECT;OK
+    2;123456789010;eni-abc123de;172.31.9.49;172.31.9.22;49761;3389;6;20;4249;1418530010;1418530070;ACCEPT;OK
   HEREDOC
 
   @@formatterCSVHashResult = <<~HEREDOC
@@ -102,7 +102,7 @@ class VPCFRTestData
       "bytes": "336",
       "start": "1432917094",
       "end": "1432917142",
-      "action": "ACCEPT",
+      "action": "REJECT",
       "logstatus": "OK"
     },
     {
@@ -118,7 +118,7 @@ class VPCFRTestData
       "bytes": "4249",
       "start": "1418530010",
       "end": "1418530070",
-      "action": "REJECT",
+      "action": "ACCEPT",
       "logstatus": "OK"
     }
   ]

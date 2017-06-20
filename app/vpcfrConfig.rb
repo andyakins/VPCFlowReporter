@@ -1,46 +1,89 @@
 require 'optparse'
-require_relative 'vpcfrJSONFormatter'
 require_relative 'vpcfrDelimitedFormatter'
 require_relative 'vpcfrFileReader'
 require_relative 'vpcfrFileWriter'
-require_relative 'vpcfrS3Writer'
+require_relative 'vpcfrJSONFormatter'
 require_relative 'vpcfrParser'
+require_relative 'vpcfrS3Writer'
+require_relative 'vpcfrSTDOUTWriter'
 
+# Namespace for classes and modules that read VPC Flow Logs, parse for
+# certain patterns, format a report, and output the created report.
+#
+# @author Andy Akins
+# @since 1.0.0
 module VPCFR
+
+  # Central configuation class for the VPCFR system. Passed a list of
+  # arguments (such as from ARGV) the class will parse the arguments,
+  # create helper objects to perform the work, and configures those objects
+  # based on the arguments given.
+  #
+  # @author Andy Akins
+  # @since 1.0.0
+  # @attr_reader [String] aggregateCol Column name to aggregate data on.
+  # @attr_reader [String] awsAccessKeyID Value to use for AWS Access Key ID, used for S3 operations.
+  # @attr_reader [String] awsRegion Value to use for the AWS region, used for S3 operations.
+  # @attr_reader [String] awsSecretAccessKey Value to use for AWS Secret Access Key, used for S3 operations.
+  # @attr_reader [String] checkCol Column name to check the pattern against.
+  # @attr_reader [Array[String]] columnNames The list of available column names.
+  # @attr_reader [String] delimiter Value of the delimiter character used in delimited output/
+  # @attr_reader [String] destination Value for the destination location for the report, needs to be approp
+  # @attr_reader [VPCFRFormatter] formatter Instance of a VPCFRFormatter-based class that will handle formatting parsed datriate to the writer class.
+  # @attr_reader [String] message Status message used for passing information to the end user.
+  # @attr_reader [VPCFRParser] parser Instance of a VPCParser class that will handle data parsing.
+  # @attr_reader [String] pattern Value to check against the check column for result matches, if regex is true should be a String representation of a regular expression.
+  # @attr_reader [VPCFRReader] reader Instance of a VPCFRReader-based class that will handle source input.
+  # @attr_reader [Boolean] regex Flag signifying if the pattern is a normal String or a String representation of a regular
+  # @attr_reader [String] source Value for the source location for the flow log, needs to be appropriate to the reader class.
+  # @attr_reader [String] version The current version of VPCFR.
+  # @attr_reader [VPCFRWriter] writer Instance of a VPCFRWriter-based class that will handle report output.a.
   class VPCFRConfig
     attr_reader :aggregateCol, :awsAccessKeyID, :awsSecretAccessKey, :awsRegion,
       :checkCol, :destination, :writer, :formatter, :parser, :pattern, :source,
-      :reader, :version, :columnNames, :delimiter, :message
+      :reader, :version, :columnNames, :delimiter, :message, :regex
 
-
-    def initialize(args)
+    # Class constructor, parses the incoming arguments and creates all the helper
+    # objects with the correct configuration.
+    #
+    # @param [Array[String]] argumentList List of the command line arguments - usually ARGV.
+    def initialize(argumentList)
+      @aggregateCol = 'srcaddr'
+      @awsAccessKeyID = ENV["AWS_ACCESS_KEY_ID"] #default to system environment
+      @awsSecretAccessKey = ENV["AWS_SECRET_ACCESS_KEY"] #default to system environment
+      @awsRegion = ENV["AWS_REGION"] #default to system environment
+      @checkCol = 'action'
       @columnNames = ['version','accountid','interfaceid','srcaddr','dstaddr',
         'srcport','dstport','protocol','packets','bytes','start','end',
         'action','logstatus']
-      @aggregateColumnNames = ['version','accountid','interfaceid','srcaddr','dstaddr',
-        'srcport','dstport','protocol','packets','bytes','start','end',
-        'action','logstatus','none']
-      @aggregateCol = 'srcaddr'
-      @awsAccessKeyID = ENV["AWS_ACCESS_KEY_ID"]
-      @awsSecretAccessKey = ENV["AWS_SECRET_ACCESS_KEY"]
-      @awsRegion = ENV["AWS_REGION"]
-      @checkCol = 'action'
       @delimiter = ','
       @destination = nil
-      @writer = nil
       @formatter = nil
-      @isGood = true
+      @message = ''
       @parser = nil
       @pattern = 'REJECT'
-      @source = nil
       @reader = nil
+      @regex = false
+      @source = nil
       @version = '1.0'
-      @message = ''
+      @writer = nil
+
+      @isGood = true
+
+      # we clone the argument list because OptionParser changes the list,
+      # and other things may want ARGV (the most likely incoming argumentList)
+      args = argumentList.clone
+
+      # convience variable for -a,--aggregate
+      aggregateColumnNames = @columnNames.clone
+      aggregateColumnNames.push('none')
+
+      requiredArgs = 2
 
       parser = OptionParser.new do |opts|
 
         opts.banner = 'Usage: vpcfr [ options ] source destination'
-        opts.on('-a','--aggregate column', @aggregateColumnNames,
+        opts.on('-a','--aggregate column', aggregateColumnNames,
           'The column to aggregate on, defaults to srcaddr. Allowed: none, version, accountid, interfaceid, srcaddr, dstaddr, srcport, dstport, protocol, packets, bytes, start, end, action, logstatus.') do |a|
           @aggregateCol = a
         end
@@ -50,20 +93,23 @@ module VPCFR
           @checkCol = c
         end
 
-        opts.on('-d', '--dest type', [:file, :s3],
+        opts.on('-d', '--destination type', [:file, :s3, :stdout ],
           'The destination type for report type, defaults to s3. Allowed: file, s3') do |d|
           case
           when d == :file
             @writer = VPCFRFileWriter.new
+          when d == :stdout
+            @writer = VPCFRSTDOUTWriter.new
+            requiredArgs = 1
           end
         end
 
         opts.on('-f','--format type', [:delimited,:json],
           'The format to output the report in, defaults to json. Allowed: delimited, json') do |f|
-            case
-            when f == :delimited
-              @formatter = VPCFRDelimitedFormatter.new(@columnNames)
-            end
+          case
+          when f == :delimited
+            @formatter = VPCFRDelimitedFormatter.new(@columnNames)
+          end
         end
 
         opts.on('--delimiter char', String,
@@ -114,6 +160,12 @@ module VPCFR
           @awsRegion = r
         end
 
+        opts.on('-x','--regex',String,
+          'Flag that signifies that the pattern provided is a ruby regular expression, e.g.: 172\.16\.*  May need to be surrounded by quotes'
+          ) do |x|
+          @regex = true
+        end
+
         opts.on('-h','--help', String, 'Display program help (this)') do |h|
           @message = opts
           @isGood = false
@@ -131,7 +183,6 @@ module VPCFR
           @delimiter =  ' '
           @formatter.delimiter = @delimiter
         end
-
       end
 
       begin
@@ -142,7 +193,6 @@ module VPCFR
       end
 
       if @isGood == true
-
         if @writer == nil
           @writer = VPCFRS3Writer.new(@awsAccessKeyID,
             @awsSecretAccessKey, @awsRegion)
@@ -156,23 +206,29 @@ module VPCFR
           @reader = VPCFRFileReader.new(@columnNames)
         end
 
-        if args.length != 2
+        if args.length < requiredArgs
           @message = "#{parser}"
           @isGood = false
         else
           @source = args[0]
-          @destination = args[1]
+          if requiredArgs == 2
+            @destination = args[1]
+          else
+            @destination = ''
+          end
           @reader.source = @source
           @writer.destination = @destination
-          @parser = VPCFRParser.new(@aggregateCol, @checkCol, @pattern)
+          @parser = VPCFRParser.new(@aggregateCol, @checkCol, @pattern, @regex)
         end
-
       end
     end
 
+    # Simple function to return if the object is a a good, or valid, state.
+    # object with the correct configuration.
+    #
+    # @return [Boolean] value of the isGood instance variable.
     def isGood?
       @isGood
     end
-
   end
 end

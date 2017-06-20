@@ -11,6 +11,7 @@
 .rvmrc
 .yardoc
 /doc
+/bin
 
 #
 # OS X ignores

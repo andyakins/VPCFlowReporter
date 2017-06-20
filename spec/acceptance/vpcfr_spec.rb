@@ -3,10 +3,14 @@ require_relative '../../app/vpcfrRunner.rb'
 require_relative '../vpcfrTestData'
 
 module VPCFR
-  RSpec.describe 'A correct configuration' do
+
+  # Script acceptance tests, leveraging the runner object to perform
+  # complete workflows.
+  RSpec.describe 'A correct script' do
     source = 'data/sample.dat'
     destination = 'data/acceptance.test'
 
+    #Local file run in JSON
     it 'can run and produce an output file' do
       if File.exist?(destination)
         FileUtils.rm(destination)
@@ -16,6 +20,8 @@ module VPCFR
       expect(FileUtils.compare_file(destination,'data/acceptNorm.dat')).to eq(true)
     end
 
+    #Default run. Will use environment variables for the AWS creds in the
+    #run (but not the tearup/teardown)
     it 'can run and write to S3' do
       s3 = Aws::S3::Resource.new(region: VPCFRTestData.awsRegion,
         credentials: Aws::Credentials.new(VPCFRTestData.awsAccessKeyID,
@@ -31,6 +37,7 @@ module VPCFR
       expect(obj.exists?).to eq(true)
     end
 
+    #RAW run to a file
     it 'can run in raw mode and produce an output file' do
       if File.exist?(destination)
         FileUtils.rm(destination)
